@@ -1,0 +1,3 @@
+"""
+KUVA RESEPTI 2
+"""
