@@ -8,9 +8,15 @@ fileName = './Data/datamap.csv'
 csvDelimiter = ';'
 dataMap = {}
 
+def getTableMap(table):
+    if table in dataMap:
+        return dataMap[table]
+    else:
+        return {}
+
 def readDataMapFile():
     with codecs.open(fileName, encoding='utf-8') as f_in:
-        print("Luetaan tiedosto: " +fileName)
+        # print("Luetaan tiedosto: " +fileName)
         lines = f_in.readlines()
 
         lineNbr = 0
@@ -20,10 +26,10 @@ def readDataMapFile():
 
             lineNbr += 1
 
-            if lineNbr < 2:
+            if lineNbr < 2 or len(line) < 1:
                 continue
 
-            print(line)
+            # print(line)
 
             if not table in dataMap:
                 dataMap[table] = {}
@@ -34,7 +40,7 @@ def readDataMapFile():
                     'area' : area,
                     'db' : db,
                     'offset' : offset,
-                    'size' : size,
+                    'size' : size.strip(),
                 }
             else:
                 print("Duplicate entry in datamap csv, line: " + lineNbr + " +column")
