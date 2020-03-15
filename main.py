@@ -3,6 +3,7 @@ MAIN MODULE
 """
 import datamap
 import plcreader
+import database
 from pprint import pprint
 from threading import Timer
 from readchar import readchar
@@ -17,8 +18,8 @@ def log_KUVA_PERUS():
     map = datamap.getTableMap('KUVA_PERUS')
     for key in map:
         map[key]['value'] = plcreader.readTagValue(map[key])
-
-    pprint(map)
+    
+    database.insertValues('KUVA_PERUS', map)
 
 def simulate(ch):
     global simulatedStatusWord
@@ -54,6 +55,7 @@ def logValues():
 
         if statusWord & 0x10 and not (previousStatusWord & 0x10):
             print("KUVA TIEDONKERUU AKTIVOITU")
+            log_KUVA_PERUS()
 
         if statusWord & 0x100 and not (previousStatusWord & 0x100):
             print("PALA TIEDONKERUU AKTIVOITU")
