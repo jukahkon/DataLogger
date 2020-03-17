@@ -14,12 +14,14 @@ previousStatusWord = 0
 simulatedStatusWord = 0
 simulation = True
 
-def log_KUVA_PERUS():
-    map = datamap.getTableMap('KUVA_PERUS')
+def logTable(tableName):
+    plcreader.clearCache()
+
+    map = datamap.getTableMap(tableName)
     for key in map:
         map[key]['value'] = plcreader.readTagValue(map[key])
     
-    database.insertValues('KUVA_PERUS', map)
+    database.insertValues(tableName, map)
 
 def simulate(ch):
     global simulatedStatusWord
@@ -37,7 +39,7 @@ def simulate(ch):
     elif ch == b'6':
         simulatedStatusWord = simulatedStatusWord ^ 0b1000
 
-def logValues():
+def checkPLCStatusAndLogData():
     global previousStatusWord
 
     if simulation:
@@ -55,7 +57,7 @@ def logValues():
 
         if statusWord & 0x10 and not (previousStatusWord & 0x10):
             print("KUVA TIEDONKERUU AKTIVOITU")
-            log_KUVA_PERUS()
+            logTable('KUVA_PERUS')
 
         if statusWord & 0x100 and not (previousStatusWord & 0x100):
             print("PALA TIEDONKERUU AKTIVOITU")
@@ -92,7 +94,7 @@ def logValues():
 def tick_1s():
     global t_periodic
 
-    logValues()
+    checkPLCStatusAndLogData()
 
     t_periodic = Timer(1 , tick_1s)
     t_periodic.setDaemon(True)

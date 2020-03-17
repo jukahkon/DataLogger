@@ -31,6 +31,23 @@ def readDataMapFile():
 
             # print(line)
 
+            size = size.strip()
+
+            if size:
+                dSize = int(size)
+            else:
+                dSize = 0
+
+            if db:
+                dDb = int(db)
+            else:
+                dDb = 0
+
+            if offset:
+                dOffset = int(offset)
+            else:
+                dOffset = 0
+
             if not table in dataMap:
                 dataMap[table] = {}
             elif not column in dataMap[table]:
@@ -38,9 +55,9 @@ def readDataMapFile():
                     'title' : title,
                     'datatype' : datatype,
                     'area' : area,
-                    'db' : db,
-                    'offset' : offset,
-                    'size' : size.strip(),
+                    'db' : dDb,
+                    'offset' : int(dOffset),
+                    'size' : dSize,
                 }
             else:
                 print("Duplicate entry in datamap csv, line: " + lineNbr + " +column")

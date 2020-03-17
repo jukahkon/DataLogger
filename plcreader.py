@@ -1,16 +1,19 @@
 """
 PLC READER
 """
-#import snap7.client
-#import snap7.util
-import Mockup.client as s7client
-import Mockup.util as s7util
+import snap7.client as s7client
+import snap7.util as s7util
+""" import sys
+sys.path.insert(1, './Mockup')
+import client as s7client
+import util as s7util """
 from snap7.snap7types import *
+from pprint import pprint
 
 plc_client = None
 
 cache = {
-    # 602 : { 'lenght': 490, 'data': b'0' }
+    602 : { 'lenght': 490, 'data': b'' }
 }
 
 def connect():
@@ -38,19 +41,27 @@ def readTagValue(tag):
 
 def readValue(area, db, datatype, offset, size=0):
     if area == 'S7AreaDB':
-        buf = readDataBlock(db, datatype, offset, size)
+        (buf, start) = readDataBlock(db, datatype, offset, size)
     elif area == 'S7AreaMK':
-        buf = readMarker(datatype, offset, size)
+        (buf, start) = readMarker(datatype, offset, size)
     else:
-        buf = b''
+        (buf, start) = (b'', 0)
     
     if buf:
         if datatype == 'INTEGER':
-            value = s7util.get_int(buf, offset)
+            value = s7util.get_int(buf, start)
         elif datatype == 'REAL':
-            value = s7util.get_real(buf, offset)
+            value = s7util.get_real(buf, start)
         elif datatype == 'STRING':
-            value = s7util.get_string(buf, offset, size)
+            value = s7util.get_string(buf, start, size)
+    else:
+        print('setting default value')
+        if datatype == 'INTEGER':
+            value = 0
+        elif datatype == 'REAL':
+            value = 0.0
+        elif datatype == 'STRING':
+            value = ''
 
     return value
 
@@ -58,20 +69,24 @@ def readDataBlock(db, datatype, offset, size):
     buf = b''
 
     if db in cache: 
+        start = offset
         if not cache[db]['data']:
             buf = plc_client.read_area(S7AreaDB, db, 0, cache[db]['lenght'])
             cache[db]['data'] = buf
         else:
             buf = cache[db]['data']
     else:
+        start = 0
         if datatype == 'INTEGER':
             buf = plc_client.read_area(S7AreaDB, db, offset, 2)
         elif datatype == 'REAL':
             buf = plc_client.read_area(S7AreaDB, db, offset, 4)
         elif datatype == 'STRING':
             buf = plc_client.read_area(S7AreaDB, db, offset, size)
+        else:
+            print('Unsupported datatype for DB')
 
-    return buf
+    return (buf, start)
 
 def readMarker(datatype, offset, size):
     buf = ''
@@ -82,22 +97,24 @@ def readMarker(datatype, offset, size):
         buf =  plc_client.read_area(S7AreaMK, 0, offset, 4)
     elif datatype == 'STRING':
         buf =  plc_client.read_area(S7AreaMK, 0, offset, size)
+    else:
+        print('Unsupported datatype for marker')
 
-    return buf
+    return (buf, 0)
 
 def clearCache():
     for key in cache:
-        cache[key] = b''
+        cache[key]['data'] = b''
 
 
 if __name__ == "__main__":
     clearCache()
     connect()
 
-    tag1 = { 'title' : '', 'datatype' : 'INTEGER', 'area' : 'S7AreaDB', 'db' : 602, 'offset' : 0, 'size' : '' }
-    tag2 = { 'title' : '', 'datatype' : 'REAL', 'area' : 'S7AreaDB', 'db' : 602, 'offset' : 2, 'size' : '' }
-    tag3 = { 'title' : '', 'datatype' : 'STRING', 'area' : 'S7AreaDB', 'db' : 602, 'offset' : 6, 'size' : '20' }
-    tag4 = { 'title' : '', 'datatype' : 'INTEGER', 'area' : 'S7AreaMK', 'db' : 0, 'offset' : 100, 'size' : '' }
+    tag1 = { 'title' : 'Tyonumero', 'datatype' : 'INTEGER', 'area' : 'S7AreaDB', 'db' : 602, 'offset' : 0, 'size' : '' }
+    tag2 = { 'title' : 'Aihion paino', 'datatype' : 'REAL', 'area' : 'S7AreaDB', 'db' : 602, 'offset' : 390, 'size' : '' }
+    tag3 = { 'title' : 'Tilaaja', 'datatype' : 'STRING', 'area' : 'S7AreaDB', 'db' : 602, 'offset' : 136, 'size' : '20' }
+    tag4 = { 'title' : 'Tilasana', 'datatype' : 'INTEGER', 'area' : 'S7AreaMK', 'db' : 0, 'offset' : 1008, 'size' : '' }
 
     print("Tag 1 value: " +str(readTagValue(tag1)))
     print("Tag 2 value: " +str(readTagValue(tag2)))
