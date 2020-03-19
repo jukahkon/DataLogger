@@ -11,10 +11,20 @@ def insertValues(table, map):
     values = ' VALUES ('
 
     for key in map:
-        columns += key + ', '
-        if map[key]['datatype'] == 'STRING':
+        datatype = map[key]['datatype']
+        if datatype == 'STRING':
+            columns += key + ', '
             values += '\'' + str(map[key]['value']) + '\', '
-        else:
+        elif datatype == 'ARRAY OF REAL':
+            array = map[key]['value']
+            baseColumn = key[:-1]
+            for i in range(0, len(array)):
+                columns += baseColumn + str(i) + ', '
+                values += str(array[i]) + ', '
+        elif datatype == 'DATE_TIME':
+            continue # SQL server generates timestamp automatically
+        elif datatype == 'REAL' or datatype == 'INTEGER':
+            columns += key + ', '
             values += str(map[key]['value']) + ', '
 
     columns = columns[:-2]
@@ -37,9 +47,11 @@ def insertValues(table, map):
 if __name__ == "__main__":
     
     map = {
-        'COLUMN_1' : { 'datatype' : 'INTEGER', 'size' : '', 'value' : 1 },
-        'COLUMN_2' : { 'datatype' : 'REAL', 'size' : '', 'value' : 1.2  },
-        'COLUMN_3' : { 'datatype' : 'STRING', 'size' : '20', 'value' : 'abcd' }
+        'INTEGER_VAL0' : { 'datatype' : 'INTEGER', 'size' : '', 'value' : 1 },
+        'REAL_VAL0' : { 'datatype' : 'REAL', 'size' : '', 'value' : 1.2  },
+        'STRING_VAL0' : { 'datatype' : 'STRING', 'size' : '20', 'value' : 'abcd' },
+        'ARRAY_VAL0' : { 'datatype' : 'ARRAY OF REAL', 'size' : '4', 'value' : [1.0, 2.0, 3.0, 4.0] },
+        'DATETIME_VAL0' : { 'datatype' : 'DATE_TIME', 'size' : '8', 'value' : '' }
     }
 
     insertValues("TABLE", map)

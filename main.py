@@ -54,6 +54,7 @@ def checkPLCStatusAndLogData():
         
         if statusWord & 0x1 and not (previousStatusWord & 0x1):
             print("KUVA NOPEAT TAULU VALMIS")
+            logTable('KUVA_NOPEAT')
 
         if statusWord & 0x10 and not (previousStatusWord & 0x10):
             print("KUVA TIEDONKERUU AKTIVOITU")
@@ -61,15 +62,19 @@ def checkPLCStatusAndLogData():
 
         if statusWord & 0x100 and not (previousStatusWord & 0x100):
             print("PALA TIEDONKERUU AKTIVOITU")
+            logTable('KYVA_PERUS')
 
         if statusWord & 0x400 and not (previousStatusWord & 0x400):
-            print("KUVA NOPEAT TAULU VALMIS")
+            print("KYVA NOPEAT TAULU VALMIS")
+            logTable('KYVA_NOPEAT')
 
         if statusWord & 0x800 and not (previousStatusWord & 0x800):
-            print("PALA TIEDONKERUU AKTIVOITU")
+            print("NAVA TIEDONKERUU AKTIVOITU")
+            logTable('NAVA_PERUS')
         
         if statusWord & 0x1000 and not (previousStatusWord & 0x1000):
             print("LAKA TIEDONKERUU AKTIVOITU")
+            logTable('LAKA_PERUS')
 
         previousStatusWord = statusWord
 
@@ -102,7 +107,7 @@ def tick_1s():
 
 
 def main():
-    print("DATA LOGGER RUNNING, PRESS 'x' TO QUIT")
+    print("DATA LOGGER STARTING, PRESS 'x' OR CTRL-c TO QUIT")
     global simulation
     sleep(1)
     datamap.readDataMapFile()
@@ -112,11 +117,11 @@ def main():
     c = ''
 
     while(c != b'x' and c != b'\x03'):
-        c = readchar()
+        c = readchar(blocking=True)
 
         if c == b's':
             simulation = not simulation
-            print("Simulation: " +str(simulation))
+            # print("Simulation: " +str(simulation))
 
         if simulation:
             simulate(c)

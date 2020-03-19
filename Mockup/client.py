@@ -15,6 +15,9 @@ from snap7.snap7types import TS7BlockInfo, param_types, cpu_statuses
 from snap7.common import check_error, load_library, ipv4
 from snap7.snap7exceptions import Snap7Exception
 
+import struct
+from pprint import pprint
+
 logger = logging.getLogger(__name__)
 
 
@@ -51,6 +54,29 @@ class Client(object):
         print("Snap7 client connect: " +address)
 
     def read_area(self, area, dbnumber, start, size):
-        print("Client::read_area: " + str(area) + " " + str(dbnumber) + " " + str(size) + " " + str(size))
-        return b'0000'
+        print("Client::read_area: " + str(area) + " " + str(dbnumber) + " " + str(start) + " " + str(size))
+        if dbnumber == 664 and start == 0:
+            return b' \x03\x19\x08\x03\x05\x00\x05'
+        elif dbnumber == 665 and start == 0:
+            buffer = ''
+
+            for i in range(0, size):
+                real = float(i)
+                real = struct.pack('>f', real)
+                buffer = buffer + real
+
+            return buffer
+        else:
+            return b'0'
+
+if __name__ == "__main__":
+    buffer = ''
+
+    for i in range(1, 5):
+        real = float(i)
+        real = struct.pack('>f', real)
+        buffer = buffer + real
+
+    print(len(buffer))
+    pprint(buffer)
 

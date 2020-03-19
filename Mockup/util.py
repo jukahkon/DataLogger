@@ -78,10 +78,12 @@ def get_real(_bytearray, byte_index):
     """
     Get real value. create float from 4 bytes
     """
-    """ x = _bytearray[byte_index:byte_index + 4]
-    real = struct.unpack('>f', struct.pack('4B', *x))[0]
-    return real """
-    return float(1.2)
+    if len(_bytearray) >= 4:
+        x = _bytearray[byte_index:byte_index + 4]
+        real = struct.unpack('>f', x)[0]
+        return real
+    else:
+        return float(1.2)
 
 
 def set_string(_bytearray, byte_index, value, max_size):

@@ -30,7 +30,8 @@ def readDataMapFile():
                 continue
 
             # print(line)
-
+            table = table.strip()
+            column = column.strip()
             size = size.strip()
 
             if size:
@@ -65,6 +66,9 @@ def readDataMapFile():
 
 if __name__ == "__main__":
     readDataMapFile()
-    pprint(dataMap)
-
+    pprint(dataMap['KUVA_PERUS']['AC1_KUVA_AVHA_VAL0'])
+    pprint(dataMap['KUVA_TRD1']['AC1_M069_PV_VAL0'])
+    pprint(dataMap['KUVA_NOP01']['AC1_KUVA_NOP01_VAL0'])
+    pprint(dataMap['KUVA_RESEPTI1']['AC1_KUVA_01ULRU_VAL0'])
+    pprint(dataMap['LAKA_TRD2']['AC1_C092_PV_VAL0'])
 
