@@ -1,20 +1,25 @@
 """
 PLC READER
 """
-#import snap7.client as s7client
-#mport snap7.util as s7util
-import sys
-sys.path.insert(1, './Mockup')
-import client as s7client
-import util as s7util
+import snap7.client as s7client
+import snap7.util as s7util
+#import sys
+#sys.path.insert(1, './Mockup')
+#import client as s7client
+#import util as s7util
 from snap7.snap7types import *
 from pprint import pprint
 
 plc_client = None
 
 cache = {
-    # 602 : { 'lenght': 490, 'data': b'' },
-    # 664 : { 'lenght' : 8810, 'data' : b'' }
+    602 : { 'lenght': 490, 'data': b'' },
+    660 : { 'lenght': 38, 'data': b'' },
+    661 : { 'lenght': 38, 'data': b'' },
+    662 : { 'lenght': 138, 'data': b'' },
+    663 : { 'lenght': 52, 'data': b'' },
+    664 : { 'lenght' : 8810, 'data' : b'' },
+    665 : { 'lenght' : 8810, 'data' : b'' }
 }
 
 def connect():

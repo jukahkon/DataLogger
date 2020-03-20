@@ -10,6 +10,7 @@ from readchar import readchar
 from time import sleep
 
 t_periodic = None
+plc_connection = False
 previousStatusWord = 0
 simulatedStatusWord = 0
 tyonumero = 0
@@ -59,7 +60,7 @@ def checkPLCStatusAndLogData():
     else:
         statusWord = plcreader.readValue('S7AreaMK', 0, 'INTEGER', 1008, 2)
 
-    # print("{0:b}".format(statusWord))
+    print("PLC STATUS: {0:b}".format(statusWord))
 
     # values that are logged once
     if statusWord != previousStatusWord:
@@ -80,10 +81,10 @@ def checkPLCStatusAndLogData():
         if statusWord & 0x10 and not (previousStatusWord & 0x10):
             print("KUVA TIEDONKERUU AKTIVOITU")
             logTable('KUVA_PERUS')
-            #logTable('KUVA_RESEPTI1')
-            #logTable('KUVA_RESEPTI2')
-            #logTable('KUVA_TRD1')
-            #logTable('KUVA_TRD2')
+            logTable('KUVA_RESEPTI1')
+            logTable('KUVA_RESEPTI2')
+            logTable('KUVA_TRD1')
+            logTable('KUVA_TRD2')
 
         if statusWord & 0x100 and not (previousStatusWord & 0x100):
             print("PALA TIEDONKERUU AKTIVOITU")
@@ -134,9 +135,19 @@ def checkPLCStatusAndLogData():
 
 
 def tick_1s():
-    global t_periodic
+    global t_periodic, plc_connection
 
-    checkPLCStatusAndLogData()
+    if not plc_connection:
+        try:
+            plcreader.connect()
+        except Exception as e:
+            print("PLC connect failed: " +str(e))
+            print("Retry ...")
+        else:
+            plc_connection = True
+
+    if plc_connection:
+        checkPLCStatusAndLogData()
 
     t_periodic = Timer(1 , tick_1s)
     t_periodic.setDaemon(True)
@@ -148,7 +159,7 @@ def main():
     global simulation
     sleep(1)
     datamap.readDataMapFile()
-    plcreader.connect()
+    
     tick_1s()
 
     c = ''
@@ -168,6 +179,5 @@ def main():
         t_periodic.cancel()
 
     plcreader.disconnect()
-
 
 main()

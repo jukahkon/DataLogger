@@ -43,7 +43,6 @@ def insertValues(table, tyonumero, map):
 
 
 def __executeInsertQuery(table, queryString):
-    print("executeQuery")
     cnxn = pyodbc.connect(connStr)
     cursor = cnxn.cursor()
     cursor.execute(queryString)
