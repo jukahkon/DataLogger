@@ -51,7 +51,8 @@ def readDataMapFile():
 
             if not table in dataMap:
                 dataMap[table] = {}
-            elif not column in dataMap[table]:
+            
+            if table in dataMap and not column in dataMap[table]:
                 dataMap[table][column] = {
                     'title' : title,
                     'datatype' : datatype,
@@ -68,6 +69,8 @@ if __name__ == "__main__":
     readDataMapFile()
     pprint(dataMap['KUVA_PERUS']['AC1_KUVA_AVHA_VAL0'])
     pprint(dataMap['KUVA_TRD1']['AC1_M069_PV_VAL0'])
+    pprint(dataMap['KUVA_NOP01']['AC1_KUVA_TYNO_VAL0'])
+    pprint(dataMap['KUVA_NOP01']['AC1_KUVA_PINR_VAL0'])
     pprint(dataMap['KUVA_NOP01']['AC1_KUVA_NOP01_VAL0'])
     pprint(dataMap['KUVA_RESEPTI1']['AC1_KUVA_01ULRU_VAL0'])
     pprint(dataMap['LAKA_TRD2']['AC1_C092_PV_VAL0'])

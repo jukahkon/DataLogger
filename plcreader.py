@@ -63,7 +63,7 @@ def readValue(area, db, datatype, offset, size=0):
                 for i in range(0, size):
                     value.append(s7util.get_real(buf, start + (4 * i)))
     else:
-        print('setting default value')
+        # print('setting default value')
         if datatype == 'INTEGER':
             value = 0
         elif datatype == 'REAL':

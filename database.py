@@ -2,10 +2,12 @@
 DATABASE LOGGER
 """
 import pyodbc
+import tracer
 
-connStr = 'DRIVER={SQL Server};SERVER=DESKTOP-56JU3BD/SQLEXPRESS;DATABASE=PLBDB1;UID=cimmgr;PWD=0proscon'
+#connStr = 'DRIVER={SQL Server};SERVER=T2RDTO38/WINCC;DATABASE=PLBDB1;UID=cimmgr;PWD=0proscon'
+connStr = 'DSN=DataLogger_32;UID=cimmgr;PWD=0proscon'
 
-def insertValues(table, map):
+def insertValues(table, tyonumero, map):
     insertTo = 'INSERT INTO cimmgr.' + table + ' '
     columns = '('
     values = ' VALUES ('
@@ -33,19 +35,32 @@ def insertValues(table, map):
     columns += ')'
     values += ')'
 
-    command = insertTo + columns + values
+    sqlQuery = insertTo + columns + values
 
-    print(command)
+    tracer.log(sqlQuery)
 
-    #cnxn = pyodbc.connect(connStr)
-    #cnxn.setencoding(encoding='utf-8')
-    #cursor = cnxn.cursor()
-    #cursor.execute("insert into cimmgr.KUVA_KESTO (AC1_KUVA_TYNO_VAL0, AC1_KUVA_PINR_VAL0) VALUES (13, 3)")
-    #cnxn.commit()
+    __executeInsertQuery(table, sqlQuery)
 
 
-if __name__ == "__main__":
+def __executeInsertQuery(table, queryString):
+    print("executeQuery")
+    cnxn = pyodbc.connect(connStr)
+    cursor = cnxn.cursor()
+    cursor.execute(queryString)
+    cursor.commit()
     
+    """
+    recordExists = 'SELECT (1) FROM cimmgr.{tb} WHERE AC1_KUVA_TYNO_VAL0={tn} AND AC1_KUVA_PINR_VAL0={pn}'.format(tb=table, tn=tyonumero, pn=pistonumero) 
+    row = cursor.execute(recordExists).fetchone()
+    if row is not None:
+        print("Record exists")
+    else:
+        print("No record exists")
+        cursor.execute(queryString)
+        cursor.commit()
+    """
+
+def __testInsertValues():
     map = {
         'INTEGER_VAL0' : { 'datatype' : 'INTEGER', 'size' : '', 'value' : 1 },
         'REAL_VAL0' : { 'datatype' : 'REAL', 'size' : '', 'value' : 1.2  },
@@ -56,3 +71,13 @@ if __name__ == "__main__":
 
     insertValues("TABLE", map)
  
+def __test_executeInsertQuery():
+    __executeInsertQuery('KUVA_KESTO', "INSERT INTO cimmgr.KUVA_KESTO (AC1_KUVA_TYNO_VAL0, AC1_KUVA_PINR_VAL0) VALUES (9001, 3)")
+
+if __name__ == "__main__":
+    # __testInsertValues()
+    
+    __test_executeInsertQuery()
+    
+    
+    

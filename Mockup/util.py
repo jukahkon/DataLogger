@@ -57,7 +57,7 @@ def get_int(bytearray_, byte_index):
     packed = struct.pack('2B', *data)
     value = struct.unpack('>h', packed)[0]
     return value """
-    return int(0)
+    return int(1)
 
 
 def set_real(_bytearray, byte_index, real):

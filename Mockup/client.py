@@ -54,10 +54,10 @@ class Client(object):
         print("Snap7 client connect: " +address)
 
     def read_area(self, area, dbnumber, start, size):
-        print("Client::read_area: " + str(area) + " " + str(dbnumber) + " " + str(start) + " " + str(size))
+        # print("Client::read_area: " + str(area) + " " + str(dbnumber) + " " + str(start) + " " + str(size))
         if dbnumber == 664 and start == 0:
             return b' \x03\x19\x08\x03\x05\x00\x05'
-        elif dbnumber == 665 and start == 0:
+        elif dbnumber == 665 or dbnumber == 664:
             buffer = ''
 
             for i in range(0, size):

@@ -12,16 +12,8 @@ from time import sleep
 t_periodic = None
 previousStatusWord = 0
 simulatedStatusWord = 0
+tyonumero = 0
 simulation = True
-
-def logTable(tableName):
-    plcreader.clearCache()
-
-    map = datamap.getTableMap(tableName)
-    for key in map:
-        map[key]['value'] = plcreader.readTagValue(map[key])
-    
-    database.insertValues(tableName, map)
 
 def simulate(ch):
     global simulatedStatusWord
@@ -37,10 +29,30 @@ def simulate(ch):
     elif ch == b'5':
         simulatedStatusWord = simulatedStatusWord ^ 0x800    
     elif ch == b'6':
-        simulatedStatusWord = simulatedStatusWord ^ 0b1000
+        simulatedStatusWord = simulatedStatusWord ^ 0x1000
+
+def logTable(tableName):
+    global tyonumero
+    tyonumero = 0
+    plcreader.clearCache()
+
+    map = datamap.getTableMap(tableName)
+    
+    if map:
+        for key in map:
+            map[key]['value'] = plcreader.readTagValue(map[key])
+        
+        if 'AC1_KUVA_TYNO_VAL0' in map:
+            tyonumero = map['AC1_KUVA_TYNO_VAL0']['value']
+
+    if tyonumero:
+        database.insertValues(tableName, tyonumero, map)
+    else:
+        print("TYO NUMERO PUUTTUU: " +tableName)
 
 def checkPLCStatusAndLogData():
     global previousStatusWord
+    global tyonumero
 
     if simulation:
         statusWord = simulatedStatusWord
@@ -54,11 +66,24 @@ def checkPLCStatusAndLogData():
         
         if statusWord & 0x1 and not (previousStatusWord & 0x1):
             print("KUVA NOPEAT TAULU VALMIS")
-            logTable('KUVA_NOPEAT')
-
+            logTable('KUVA_NOP01')
+            logTable('KUVA_NOP02')
+            logTable('KUVA_NOP03')
+            logTable('KUVA_NOP04')
+            logTable('KUVA_NOP05')
+            logTable('KUVA_NOP06')
+            logTable('KUVA_NOP07')
+            logTable('KUVA_NOP08')
+            logTable('KUVA_NOP09')
+            logTable('KUVA_NOP10')
+            
         if statusWord & 0x10 and not (previousStatusWord & 0x10):
             print("KUVA TIEDONKERUU AKTIVOITU")
             logTable('KUVA_PERUS')
+            #logTable('KUVA_RESEPTI1')
+            #logTable('KUVA_RESEPTI2')
+            #logTable('KUVA_TRD1')
+            #logTable('KUVA_TRD2')
 
         if statusWord & 0x100 and not (previousStatusWord & 0x100):
             print("PALA TIEDONKERUU AKTIVOITU")
@@ -66,15 +91,27 @@ def checkPLCStatusAndLogData():
 
         if statusWord & 0x400 and not (previousStatusWord & 0x400):
             print("KYVA NOPEAT TAULU VALMIS")
-            logTable('KYVA_NOPEAT')
+            logTable('KYVA_NOP01')
+            logTable('KYVA_NOP02')
+            logTable('KYVA_NOP03')
+            logTable('KYVA_NOP04')
+            logTable('KYVA_NOP05')
+            logTable('KYVA_NOP06')
+            logTable('KYVA_NOP07')
+            logTable('KYVA_NOP08')
+            logTable('KYVA_NOP09')
+            logTable('KYVA_NOP10')
 
         if statusWord & 0x800 and not (previousStatusWord & 0x800):
             print("NAVA TIEDONKERUU AKTIVOITU")
             logTable('NAVA_PERUS')
+            logTable('KUVA_TRD1')
         
         if statusWord & 0x1000 and not (previousStatusWord & 0x1000):
             print("LAKA TIEDONKERUU AKTIVOITU")
             logTable('LAKA_PERUS')
+            logTable('LAKA_TRD1')
+            logTable('LAKA_TRD2')
 
         previousStatusWord = statusWord
 
